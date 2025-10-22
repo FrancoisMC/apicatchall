@@ -1,0 +1,11 @@
+# Fichier de configuration pour le développement local
+# Ce fichier permet d'utiliser l'application sans SSL en local
+version: '3.8'
+
+services:
+  nginx:
+    volumes:
+      - ./nginx/nginx-dev.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "80:80"  # Port 8080 pour éviter les conflits
+
