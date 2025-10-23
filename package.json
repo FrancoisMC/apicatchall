@@ -19,11 +19,26 @@
     "archiver": "^7.0.1",
     "cors": "^2.8.5",
     "ejs": "^3.1.9",
-    "express": "^4.18.2",
+    "express": "^5.1.0",
     "morgan": "^1.10.0",
     "sqlite3": "^5.1.6"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.1.10"
+  },
+  "overrides": {
+    "inflight": "npm:@isaacs/inflight@^1.0.6",
+    "rimraf": "^5.0.0",
+    "glob": "^10.0.0",
+    "npmlog": "npm:@npmcli/arborist@^7.0.0",
+    "gauge": "npm:@npmcli/arborist@^7.0.0",
+    "are-we-there-yet": "npm:@npmcli/arborist@^7.0.0",
+    "@npmcli/move-file": "npm:@npmcli/fs@^3.0.0"
+  },
+  "resolutions": {
+    "npmlog": "npm:@npmcli/arborist@^7.0.0",
+    "gauge": "npm:@npmcli/arborist@^7.0.0", 
+    "are-we-there-yet": "npm:@npmcli/arborist@^7.0.0",
+    "@npmcli/move-file": "npm:@npmcli/fs@^3.0.0"
   }
 }

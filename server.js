@@ -312,62 +312,37 @@ app.post('/delete-request', (req, res) => {
 });
 
 // Route catchall pour POST et PUT - retourne toujours 200 OK
-app.post('*', (req, res) => {
-    // Capturer les données de la requête
-    const requestData = {
-        method: req.method,
-        url: req.originalUrl,
-        ipSource: getClientIP(req),
-        userAgent: req.headers['user-agent'],
-        contentType: req.headers['content-type'],
-        contentLength: req.headers['content-length'],
-        headers: req.headers,
-        payload: JSON.stringify(req.body) || req.body,
-        queryParams: req.query
-    };
+app.use((req, res, next) => {
+    if (req.method === 'POST' || req.method === 'PUT') {
+        // Capturer les données de la requête
+        const requestData = {
+            method: req.method,
+            url: req.originalUrl,
+            ipSource: getClientIP(req),
+            userAgent: req.headers['user-agent'],
+            contentType: req.headers['content-type'],
+            contentLength: req.headers['content-length'],
+            headers: req.headers,
+            payload: JSON.stringify(req.body) || req.body,
+            queryParams: req.query
+        };
 
-    // Enregistrer en base de données
-    db.insertRequest(requestData);
+        // Enregistrer en base de données
+        db.insertRequest(requestData);
 
-
-    res.status(config.responseCode).json({
-        success: true,
-        //message: 'Requête capturée avec succès',
-        timestamp: new Date().toISOString(),
-        method: req.method,
-        url: req.originalUrl
-    });
-});
-
-app.put('*', (req, res) => {
-    // Capturer les données de la requête
-    const requestData = {
-        method: req.method,
-        url: req.originalUrl,
-        ipSource: getClientIP(req),
-        userAgent: req.headers['user-agent'],
-        contentType: req.headers['content-type'],
-        contentLength: req.headers['content-length'],
-        headers: req.headers,
-        payload: JSON.stringify(req.body) || req.body,
-        queryParams: req.query
-    };
-
-    // Enregistrer en base de données
-    db.insertRequest(requestData);
-
-
-    res.status(config.responseCode).json({
-        success: true,
-        //message: 'Requête capturée avec succès',
-        timestamp: new Date().toISOString(),
-        method: req.method,
-        url: req.originalUrl
-    });
+        return res.status(config.responseCode).json({
+            success: true,
+            //message: 'Requête capturée avec succès',
+            timestamp: new Date().toISOString(),
+            method: req.method,
+            url: req.originalUrl
+        });
+    }
+    next();
 });
 
 // Route GET pour afficher les données (doit être en dernier)
-app.get('*', (req, res) => {
+app.get('/', (req, res) => {
     db.getAllRequests((err, requests) => {
         if (err) {
             console.error('Erreur lors de la récupération des données:', err);
@@ -380,6 +355,26 @@ app.get('*', (req, res) => {
             currentTime: new Date().toLocaleString('fr-FR')
         });
     });
+});
+
+// Route catchall pour toutes les autres routes GET
+app.use((req, res, next) => {
+    if (req.method === 'GET' && req.path !== '/') {
+        db.getAllRequests((err, requests) => {
+            if (err) {
+                console.error('Erreur lors de la récupération des données:', err);
+                return res.status(500).send('Erreur serveur');
+            }
+            
+            res.render('index', { 
+                requests: requests,
+                totalRequests: requests.length,
+                currentTime: new Date().toLocaleString('fr-FR')
+            });
+        });
+    } else {
+        next();
+    }
 });
 
 // Configuration du moteur de template EJS
